@@ -32,9 +32,16 @@ def get_int_input(minimum, maximum, default):
 
 	return result
 
+def make_vertices(first_year, last_year, dates, values):
+	first_index = dates.index[dates.str.match("%d/01" % first_year)][0]
+	last_index = dates.index[dates.str.match("%d/12" % last_year)][0]
+
+	print("Processing lines %d to %d" % (first_index, last_index))
+
 def main(filename):
 	all_data = pd.read_csv(filename, delim_whitespace=True, header=None)
 	dates = all_data[0]
+	median = all_data[1]
 	first_year = get_year(dates[0])
 	year_count = math.floor(len(dates) / 12)
 	last_month = dates[year_count * 12 - 1]
@@ -45,7 +52,7 @@ def main(filename):
 	chosen_first_year = get_int_input(first_year, last_year, first_year)
 	chosen_last_year = get_int_input(chosen_first_year, last_year, last_year)
 
-
+	vertices = make_vertices(chosen_first_year, chosen_last_year, dates, median)
 
 
 # Run main method
