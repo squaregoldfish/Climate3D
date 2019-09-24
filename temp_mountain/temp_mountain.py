@@ -7,10 +7,45 @@ https://www.metoffice.gov.uk/hadobs/hadcrut4/data/current/download.html
 '''
 
 import sys
-import pandas
+import math
+import pandas as pd
+
+def get_year(yearmonth):
+	return int(yearmonth[0:4])
+
+def get_int_input(minimum, maximum, default):
+	input_ok = False
+	result = default
+
+	while not input_ok:
+		value = input("First year [%d]: " % default)
+		try:
+			if value == "":
+				result = int(default)
+				input_ok = True
+			else:
+				result = int(value)
+				if result >= minimum and result <= maximum:
+					input_ok = True
+		except:
+			pass
+
+	return result
 
 def main(filename):
-	print(filename)
+	all_data = pd.read_csv(filename, delim_whitespace=True, header=None)
+	dates = all_data[0]
+	first_year = get_year(dates[0])
+	year_count = math.floor(len(dates) / 12)
+	last_month = dates[year_count * 12 - 1]
+	last_year = get_year(last_month)
+
+	print("Date range: %d to %d" % (first_year, last_year))
+
+	chosen_first_year = get_int_input(first_year, last_year, first_year)
+	chosen_last_year = get_int_input(chosen_first_year, last_year, last_year)
+
+
 
 
 # Run main method
