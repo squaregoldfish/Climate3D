@@ -10,6 +10,8 @@ import sys
 import math
 import pandas as pd
 
+MAX_HEIGHT = 20
+
 def get_year(yearmonth):
 	return int(yearmonth[0:4])
 
@@ -37,6 +39,12 @@ def make_vertices(first_year, last_year, dates, values):
 	last_index = dates.index[dates.str.match("%d/12" % last_year)][0]
 	year_count = last_year - first_year + 1
 
+	# Shift values so minumum is zero
+	values = values + abs(min(values))
+
+	# Scale to maximum height
+	values = values * (MAX_HEIGHT / max(values))
+
 	current_month = 1
 	year_index = year_count
 
@@ -44,8 +52,9 @@ def make_vertices(first_year, last_year, dates, values):
 		angle = (360 / 12 * (current_month - 1)) * (math.pi / 180)
 		xpos = math.sin(angle) * year_index
 		ypos = math.cos(angle) * year_index
+		zpos = values[i]
 
-		print("%.2f, %.2f" % (xpos, ypos))
+		print("%.4f, %.4f, %.4f" % (xpos, ypos, zpos))
 
 
 		current_month += 1
