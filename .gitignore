@@ -103,6 +103,11 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# Blender files
+**/*.blend1
+
 # Data files
 **/HadCRUT*
 
+# Generated files
+temp_mountain/temp_mountain_vertices.csv
