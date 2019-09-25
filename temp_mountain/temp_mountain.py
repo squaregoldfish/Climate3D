@@ -35,8 +35,24 @@ def get_int_input(minimum, maximum, default):
 def make_vertices(first_year, last_year, dates, values):
 	first_index = dates.index[dates.str.match("%d/01" % first_year)][0]
 	last_index = dates.index[dates.str.match("%d/12" % last_year)][0]
+	year_count = last_year - first_year + 1
 
-	print("Processing lines %d to %d" % (first_index, last_index))
+	current_month = 1
+	year_index = year_count
+
+	for i in range(first_index, last_index):
+		angle = (360 / 12 * (current_month - 1)) * (math.pi / 180)
+		xpos = math.sin(angle) * year_index
+		ypos = math.cos(angle) * year_index
+
+		print("%.2f, %.2f" % (xpos, ypos))
+
+
+		current_month += 1
+		if current_month > 12:
+			current_month = 1
+			year_index -= 1
+
 
 def main(filename):
 	all_data = pd.read_csv(filename, delim_whitespace=True, header=None)
