@@ -10,7 +10,7 @@ import sys
 import math
 import pandas as pd
 
-MAX_HEIGHT = 20
+MAX_HEIGHT = 200
 OUT_FILE = "temp_mountain_vertices.csv"
 
 def get_year(yearmonth):
