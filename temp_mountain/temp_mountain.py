@@ -51,7 +51,7 @@ def make_vertices(first_year, last_year, dates, values):
 
 	out = open(OUT_FILE, "w")
 
-	for i in range(first_index, last_index):
+	for i in range(first_index, last_index + 1):
 		angle = (360 / 12 * (current_month - 1)) * (math.pi / 180)
 		xpos = math.sin(angle) * year_index
 		ypos = math.cos(angle) * year_index
