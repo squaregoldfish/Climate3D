@@ -9,34 +9,66 @@ current_dir = os.path.dirname(bpy.data.filepath)
 csvpath = os.path.join(current_dir, 'temp_mountain_vertices.csv')
 csvfile = open(csvpath)
 inFile = csv.reader(csvfile, delimiter=',', quotechar='"')
+rows = list(inFile)
 
 # Read vertices. They'll be in time order from the file
-last_vertex = None
-current_vertex = None
-jan_vertex = 0
+current_row = 0
+last_vertex_outer = None
+last_vertex_inner = None
+jan_vertex_outer = None
+jan_vertex_inner = None
 current_month = 1
-vertex_count = 0
-vertices = []
-edges = []
 
-for row in inFile:
-    current_vertex = (float(row[0]), float(row[1]), float(row[2]))
-    vertices.append(current_vertex)
-    if current_month == 1:
-        jan_vertex = vertex_count
-        
-    if current_month > 1:
-        edges.append((vertex_count - 1, vertex_count))
+vertices = []
+polygons = []
+
+while current_row < len(rows):
+    outer = rows[current_row]
+    inner = rows[current_row + 1]
+    vertices.append((float(outer[0]), float(outer[1]), float(outer[2])))
+    vertices.append((float(inner[0]), float(inner[1]), float(inner[2])))
     
+    if current_month == 1:
+        jan_vertex_outer = current_row
+        jan_vertex_inner = current_row + 1
+    else:
+        print("%d %d %d %d" % (last_vertex_outer, last_vertex_inner, current_row, current_row + 1))
+        polygons.append((last_vertex_outer, last_vertex_inner, current_row + 1, current_row))
+        
     current_month += 1
     if current_month > 12:
-        edges.append((vertex_count, jan_vertex))
+        print("%d %d %d %d" % (current_row, current_row + 1, jan_vertex_outer, jan_vertex_inner))
+        polygons.append((current_row, current_row + 1, jan_vertex_inner, jan_vertex_outer))
+        last_vertex_outer = None
+        last_vertex_inner = None
         current_month = 1
-    vertex_count += 1
+    else:
+        last_vertex_outer = current_row
+        last_vertex_inner = current_row + 1
+        
+    current_row += 2
+
+#for row in inFile:
+
+
+
+#    current_vertex = (float(row[0]), float(row[1]), float(row[2]))
+ #   vertices.append(current_vertex)
+#    if current_month == 1:
+#        jan_vertex = vertex_count
+        
+    #if current_month > 1:
+    #    edges.append((vertex_count - 1, vertex_count))
+    
+ #   current_month += 1
+#    if current_month > 12:
+        #edges.append((vertex_count, jan_vertex))
+#        current_month = 1
+#    vertex_count += 1
     
 #********* Assuming we have a rectangular grid *************
-xSize = next( i for i in range( len(vertices) ) if vertices[i][0] != vertices[i+1][0] ) + 1 #Find the first change in X
-ySize = len(vertices) // xSize
+#xSize = next( i for i in range( len(vertices) ) if vertices[i][0] != vertices[i+1][0] ) + 1 #Find the first change in X
+#ySize = len(vertices) // xSize
 
 #Generate the polygons (four vertices linked in a face)
 #polygons = [(i, i - 1, i - 1 + xSize, i + xSize) for i in range( 1, len(vertices) - xSize ) if i % xSize != 0]
@@ -45,7 +77,7 @@ name = "mountain"
 mesh = bpy.data.meshes.new( name ) #Create the mesh (inner data)
 obj = bpy.data.objects.new( name, mesh ) #Create an object
 
-obj.data.from_pydata( vertices, edges, [] ) #Associate vertices and polygons
+obj.data.from_pydata( vertices, [], polygons ) #Associate vertices and polygons
 
 #obj.scale = (1, 5, 0.2) #Scale it (if needed)
 #for p in obj.data.polygons: #Set smooth shading (if needed)

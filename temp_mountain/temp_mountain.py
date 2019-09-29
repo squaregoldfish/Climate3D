@@ -53,11 +53,18 @@ def make_vertices(first_year, last_year, dates, values):
 
 	for i in range(first_index, last_index + 1):
 		angle = (360 / 12 * (current_month - 1)) * (math.pi / 180)
+
+		# Calculate two positions one for the current year index, and one for the
+		# next year. This gives a 2D surface to make a 'track' for each year
 		xpos = math.sin(angle) * year_index
+		xpos2 = math.sin(angle) * (year_index - 1)
 		ypos = math.cos(angle) * year_index
+		ypos2 = math.cos(angle) * (year_index - 1)
+
 		zpos = values[i]
 
 		out.write("%.4f,%.4f,%.4f\n" % (xpos, ypos, zpos))
+		out.write("%.4f,%.4f,%.4f\n" % (xpos2, ypos2, zpos))
 
 		current_month += 1
 		if current_month > 12:
