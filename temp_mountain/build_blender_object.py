@@ -32,12 +32,10 @@ while current_row < len(rows):
         jan_vertex_outer = current_row
         jan_vertex_inner = current_row + 1
     else:
-        print("%d %d %d %d" % (last_vertex_outer, last_vertex_inner, current_row, current_row + 1))
         polygons.append((last_vertex_outer, last_vertex_inner, current_row + 1, current_row))
         
     current_month += 1
     if current_month > 12:
-        print("%d %d %d %d" % (current_row, current_row + 1, jan_vertex_outer, jan_vertex_inner))
         polygons.append((current_row, current_row + 1, jan_vertex_inner, jan_vertex_outer))
         last_vertex_outer = None
         last_vertex_inner = None
@@ -48,39 +46,8 @@ while current_row < len(rows):
         
     current_row += 2
 
-#for row in inFile:
-
-
-
-#    current_vertex = (float(row[0]), float(row[1]), float(row[2]))
- #   vertices.append(current_vertex)
-#    if current_month == 1:
-#        jan_vertex = vertex_count
-        
-    #if current_month > 1:
-    #    edges.append((vertex_count - 1, vertex_count))
-    
- #   current_month += 1
-#    if current_month > 12:
-        #edges.append((vertex_count, jan_vertex))
-#        current_month = 1
-#    vertex_count += 1
-    
-#********* Assuming we have a rectangular grid *************
-#xSize = next( i for i in range( len(vertices) ) if vertices[i][0] != vertices[i+1][0] ) + 1 #Find the first change in X
-#ySize = len(vertices) // xSize
-
-#Generate the polygons (four vertices linked in a face)
-#polygons = [(i, i - 1, i - 1 + xSize, i + xSize) for i in range( 1, len(vertices) - xSize ) if i % xSize != 0]
-
 name = "mountain"
 mesh = bpy.data.meshes.new( name ) #Create the mesh (inner data)
 obj = bpy.data.objects.new( name, mesh ) #Create an object
-
 obj.data.from_pydata( vertices, [], polygons ) #Associate vertices and polygons
-
-#obj.scale = (1, 5, 0.2) #Scale it (if needed)
-#for p in obj.data.polygons: #Set smooth shading (if needed)
-#    p.use_smooth = True
-
 bpy.context.scene.collection.objects.link( obj ) #Link the object to the scene
