@@ -1,50 +1,51 @@
 MONTH_ANGLE=-30;
-MODEL_WIDTH=300;
-MODEL_HEIGHT=300;
-BASE_THICKNESS=5;
+BASE_THICKNESS=2.5;
 
-FIRST_YEAR=1950;
-LAST_YEAR=1980;
+WIDTH = 0;
+HEIGHT = 1;
+START_YEAR = 2;
+END_YEAR = 3;
+MIN_TEMP = 4;
+MAX_TEMP = 5;
+LAST_TEMP = 6;
 
-YEARS=LAST_YEAR - FIRST_YEAR + 1;
+function temp_height(params, temp) = ((params[HEIGHT] - BASE_THICKNESS) / (params[MAX_TEMP] - params[MIN_TEMP])) * (temp - params[MIN_TEMP]);
 
-year_width = MODEL_WIDTH / (YEARS * 2);
+function years(params) = params[END_YEAR] - params[START_YEAR] + 1;
 
-last_temp = 30;
+function year_width(params) = (params[WIDTH]) / ((years(params) + 2) * 2);
 
-//cylinder(h=BASE_THICKNESS, r=MODEL_WIDTH / 2, $fn=12);
-
-// Lift us onto the base
-translate([0, 0, BASE_THICKNESS]) {
-    // The central pillar
-    cylinder(h=last_temp, r=year_width, $fn=12);
+module month_section(params, year, month, start_temp, end_temp) {
+    years_from_end = params[END_YEAR] - year;
+    start_theta = MONTH_ANGLE * (month - 1);
+    end_theta = MONTH_ANGLE * month;
+        
+    // Pillar + month spiral + number of years
+    start_inner_offset = year_width(params) + (month - 1) * (year_width(params) / 12) + (years_from_end) * year_width(params);
+    start_outer_offset = start_inner_offset + year_width(params);
+    end_inner_offset = year_width(params) + month * (year_width(params) / 12) + (years_from_end) * year_width(params);
+    end_outer_offset = end_inner_offset + year_width(params);
     
-    // Spiral out one cycle at the same height to get
-    // us to the first proper year
-    for (i = [1:12]) {
-        
-        start_theta = MONTH_ANGLE * (i - 1);
-        end_theta = MONTH_ANGLE * i;
-        
-        start_sin_inner = sin(start_theta) * year_width;
-        start_cos_inner = cos(start_theta) * year_width;
-        end_sin_inner = sin(end_theta) * year_width;
-        end_cos_inner = cos(end_theta) * year_width;
-        start_sin_outer = sin(start_theta) * ((i - 1) * year_width / 12 + year_width);
-        start_cos_outer = cos(start_theta) * ((i - 1) * year_width / 12 + year_width);
-        end_sin_outer = sin(end_theta) * (i * year_width / 12 + year_width);
-        end_cos_outer = cos(end_theta) * (i * year_width / 12 + year_width);
-        
+    start_sin_inner = sin(start_theta) * start_inner_offset;
+    start_cos_inner = cos(start_theta) * start_inner_offset;
+    end_sin_inner = sin(end_theta) * end_inner_offset;
+    end_cos_inner = cos(end_theta) * end_inner_offset;
+    start_sin_outer = sin(start_theta) * start_outer_offset;
+    start_cos_outer = cos(start_theta) * start_outer_offset;
+    end_sin_outer = sin(end_theta) * end_outer_offset;
+    end_cos_outer = cos(end_theta) * end_outer_offset;
+    
+    translate([0, 0, BASE_THICKNESS]) {
         polyhedron(
             points = [
-                [start_sin_inner, start_cos_inner, 0], // inner bottom start
-                [end_sin_inner, end_cos_inner, 0], // inner bottom end
-                [end_sin_outer, end_cos_outer, 0], // outer bottom end
-                [start_sin_outer, start_cos_outer, 0], // outer bottom start
-                [start_sin_inner, start_cos_inner, last_temp], // inner top start
-                [end_sin_inner, end_cos_inner, last_temp], // inner top end
-                [end_sin_outer, end_cos_outer, last_temp], // outer top end
-                [start_sin_outer, start_cos_outer, last_temp] // outer top start
+                [start_sin_inner, start_cos_inner, temp_height(params, params[MIN_TEMP])], // inner bottom start
+                [end_sin_inner, end_cos_inner, temp_height(params, params[MIN_TEMP])], // inner bottom end
+                [end_sin_outer, end_cos_outer, temp_height(params, params[MIN_TEMP])], // outer bottom end
+                [start_sin_outer, start_cos_outer, temp_height(params, params[MIN_TEMP])], // outer bottom start
+                [start_sin_inner, start_cos_inner, temp_height(params, start_temp)], // inner top start
+                [end_sin_inner, end_cos_inner, temp_height(params, end_temp)], // inner top end
+                [end_sin_outer, end_cos_outer, temp_height(params, end_temp)], // outer top end
+                [start_sin_outer, start_cos_outer, temp_height(params, start_temp)] // outer top start
             ],
             faces = [
                 [0,1,2,3],  // bottom
@@ -58,3 +59,30 @@ translate([0, 0, BASE_THICKNESS]) {
     }
 }
 
+module init(params) {    
+    // Make the base and the middle column
+    cylinder(h=BASE_THICKNESS, r=params[WIDTH] / 2, $fn=12);
+    
+    // The central pillar
+    translate([0, 0, BASE_THICKNESS]) {
+        cylinder(h=temp_height(params, params[LAST_TEMP]), r=year_width(params), $fn=12);
+    }    
+
+    // Spiral out one cycle at the same height to get
+    // us to the end of the last year
+    for (i = [1:12]) {
+        month_section(params, params[END_YEAR] + 1, i, params[LAST_TEMP], params[LAST_TEMP]);
+    }
+}
+
+
+
+MODEL_PARAMS = [280, 300, 1990, 2000, 0, 12, 12];
+
+init(MODEL_PARAMS);
+
+for (y = [1990:2000]) {
+    for (m = [1:12]) {
+        month_section(MODEL_PARAMS, y, m, m, m);
+    }
+}
