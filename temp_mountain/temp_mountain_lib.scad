@@ -9,11 +9,12 @@ MIN_TEMP = 4;
 MAX_TEMP = 5;
 LAST_TEMP = 6;
 
-function temp_height(params, temp) = ((params[HEIGHT] - BASE_THICKNESS) / (params[MAX_TEMP] - params[MIN_TEMP])) * (temp - params[MIN_TEMP]);
+function temp_height(params, temp) =
+    ((params[HEIGHT] - BASE_THICKNESS) / (params[MAX_TEMP] - params[MIN_TEMP])) * (temp - params[MIN_TEMP]);
 
 function years(params) = params[END_YEAR] - params[START_YEAR] + 1;
 
-function year_width(params) = (params[WIDTH]) / ((years(params) + 2) * 2);
+function year_width(params) = (params[WIDTH] - 10) / ((years(params) + 2) * 2);
 
 module month_section(params, year, month, start_temp, end_temp) {
     years_from_end = params[END_YEAR] - year;
@@ -21,9 +22,11 @@ module month_section(params, year, month, start_temp, end_temp) {
     end_theta = MONTH_ANGLE * month;
         
     // Pillar + month spiral + number of years
-    start_inner_offset = year_width(params) + (month - 1) * (year_width(params) / 12) + (years_from_end) * year_width(params);
+    start_inner_offset =
+        year_width(params) + (12 - month + 1) * (year_width(params) / 12) + (years_from_end) * year_width(params);
     start_outer_offset = start_inner_offset + year_width(params);
-    end_inner_offset = year_width(params) + month * (year_width(params) / 12) + (years_from_end) * year_width(params);
+    end_inner_offset =
+        year_width(params) + (12 - month) * (year_width(params) / 12) + (years_from_end) * year_width(params);
     end_outer_offset = end_inner_offset + year_width(params);
     
     start_sin_inner = sin(start_theta) * start_inner_offset;
@@ -72,17 +75,5 @@ module init(params) {
     // us to the end of the last year
     for (i = [1:12]) {
         month_section(params, params[END_YEAR] + 1, i, params[LAST_TEMP], params[LAST_TEMP]);
-    }
-}
-
-
-
-MODEL_PARAMS = [280, 300, 1990, 2000, 0, 12, 12];
-
-init(MODEL_PARAMS);
-
-for (y = [1990:2000]) {
-    for (m = [1:12]) {
-        month_section(MODEL_PARAMS, y, m, m, m);
     }
 }
