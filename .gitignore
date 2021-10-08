@@ -106,4 +106,12 @@ venv.bak/
 # Data files
 **/HadCRUT*
 
+# Files made by scripts
+temp_mountain/temp_mountain_build.scad
+
+# Mac bollocks
 .DS_Store
+
+# PyCharm bollocks
+**/.idea
+
