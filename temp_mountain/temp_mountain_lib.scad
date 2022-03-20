@@ -1,20 +1,26 @@
+WIDTH=150;
+HEIGHT=150;
 MONTH_ANGLE=-30;
+BASE_OUTLINE=20;
 BASE_THICKNESS=2.5;
 
-WIDTH = 0;
-HEIGHT = 1;
-START_YEAR = 2;
-END_YEAR = 3;
-MIN_TEMP = 4;
-MAX_TEMP = 5;
-LAST_TEMP = 6;
+TEXT_FONT="DejaVu Sans";
+TEXT_SIZE=3;
+TEXT_THICKNESS=1;
+
+// params parameter indices
+START_YEAR = 0;
+END_YEAR = 1;
+MIN_TEMP = 2;
+MAX_TEMP = 3;
+LAST_TEMP = 4;
 
 function temp_height(params, temp) =
-    ((params[HEIGHT] - BASE_THICKNESS) / (params[MAX_TEMP] - params[MIN_TEMP])) * (temp - params[MIN_TEMP]);
+    ((HEIGHT - BASE_THICKNESS) / (params[MAX_TEMP] - params[MIN_TEMP])) * (temp - params[MIN_TEMP]);
 
 function years(params) = params[END_YEAR] - params[START_YEAR] + 1;
 
-function year_width(params) = (params[WIDTH] - 10) / ((years(params) + 2) * 2);
+function year_width(params) = (WIDTH - BASE_OUTLINE) / ((years(params) + 2) * 2);
 
 module month_section(params, year, month, start_temp, end_temp) {
     years_from_end = params[END_YEAR] - year;
@@ -62,9 +68,26 @@ module month_section(params, year, month, start_temp, end_temp) {
     }
 }
 
+module write_text(params, text) {
+    for (i = [0:11]) {
+        if (text[i] != "") {
+            text_angle = 180 - MONTH_ANGLE * (i + 1) + (MONTH_ANGLE / 2);
+            x_offset = (WIDTH - BASE_OUTLINE / 2) / 2 * sin(text_angle);
+            y_offset = (WIDTH - BASE_OUTLINE / 2) / 2 * cos(text_angle) * -1;
+            translate([x_offset, y_offset, BASE_THICKNESS - 0.5]) {
+                rotate(text_angle) {
+                    linear_extrude(TEXT_THICKNESS + 0.5) {
+                        text(text[i], font = TEXT_FONT, size = TEXT_SIZE, halign="center", valign="baseline");
+                    }
+                }
+            }
+        }
+    }
+}
+
 module init(params) {    
     // Make the base and the middle column
-    cylinder(h=BASE_THICKNESS, r=params[WIDTH] / 2, $fn=12);
+    cylinder(h=BASE_THICKNESS, r=WIDTH / 2, $fn=12);
     
     // The central pillar
     translate([0, 0, BASE_THICKNESS]) {
