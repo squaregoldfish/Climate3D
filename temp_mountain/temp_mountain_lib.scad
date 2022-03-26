@@ -4,9 +4,10 @@ MONTH_ANGLE=-30;
 BASE_OUTLINE=20;
 BASE_THICKNESS=2.5;
 
-TEXT_FONT="DejaVu Sans";
-TEXT_SIZE=3;
-TEXT_THICKNESS=1;
+TEXT_FONT="DejaVu Sans Bold";
+RIM_TEXT_SIZE=5.3;
+RIM_TEXT_THICKNESS=1;
+UNDER_TEXT_SIZE=8;
 
 // params parameter indices
 START_YEAR = 0;
@@ -68,7 +69,7 @@ module month_section(params, year, month, start_temp, end_temp) {
     }
 }
 
-module write_text(params, text) {
+module write_rim_text(params, text) {
     for (i = [0:11]) {
         if (text[i] != "") {
             text_angle = 180 - MONTH_ANGLE * (i + 1) + (MONTH_ANGLE / 2);
@@ -76,8 +77,8 @@ module write_text(params, text) {
             y_offset = (WIDTH - BASE_OUTLINE / 2) / 2 * cos(text_angle) * -1;
             translate([x_offset, y_offset, BASE_THICKNESS - 0.5]) {
                 rotate(text_angle) {
-                    linear_extrude(TEXT_THICKNESS + 0.5) {
-                        text(text[i], font = TEXT_FONT, size = TEXT_SIZE, halign="center", valign="baseline");
+                    linear_extrude(RIM_TEXT_THICKNESS + 0.5) {
+                        text(text[i], font = TEXT_FONT, size = RIM_TEXT_SIZE, halign="center", valign="baseline");
                     }
                 }
             }
@@ -85,7 +86,20 @@ module write_text(params, text) {
     }
 }
 
-module init(params) {    
+module write_under_text(params, text) {
+    offset_base = (UNDER_TEXT_SIZE + 5) * (len(text) / 2);
+    for (i = [0:len(text) - 1]) {
+        translate([0, offset_base + (i * (UNDER_TEXT_SIZE + 5)) * -1, -0.1]) {
+            linear_extrude(0.5) {
+                mirror([1, 0, 0]) {
+                    text(text[i], font = TEXT_FONT, size = UNDER_TEXT_SIZE, halign = "center", valign = "center");
+                }
+            }
+        }
+    }
+}
+
+module base_and_centre(params) {
     // Make the base and the middle column
     cylinder(h=BASE_THICKNESS, r=WIDTH / 2, $fn=12);
     

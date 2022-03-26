@@ -3,11 +3,29 @@ import pandas as pd
 START_YEAR = 1922
 END_YEAR = 2021
 
-BASE_TEXT = ['HadCRUT', f'{START_YEAR} - {END_YEAR}', '', 'Steve Jones', '@squaregoldfish',
-             '', 'Inspired by', 'Ed Hawkins', '@ed_hawkins', '', '', '']
+RIM_TEXT = ['HadCRUT', f'{START_YEAR}-{END_YEAR}', '', '', '',
+            '', '', '', '', '', '', '']
+
+UNDER_TEXT = ['Steve Jones', '@squaregoldfish', '', 'Inspired by', 'Ed Hawkins', '@ed_hawkins']
+
+
+def make_text_array(name, contents):
+    # The text array
+    line = f'{name} = ['
+
+    for i in range(0, len(contents)):
+        line += '"'
+        line += contents[i]
+        line += '"'
+        if i < len(contents) - 1:
+            line += ', '
+
+    line += '];\n'
+
+    return line
+
 
 temps = pd.DataFrame(columns=['year', 'month', 'temperature'])
-
 hadcrut = pd.read_csv('HadCRUT.5.0.1.0.analysis.summary_series.global.monthly.csv')
 for index, row in hadcrut.iterrows():
     year, month = row['Time'].split("-")
@@ -30,22 +48,17 @@ with open('temp_mountain_build.scad', 'w') as out:
         f'{max(temps["temperature"]):.3f}, {temps["temperature"].iloc[-1]:.3f}];\n'
     )
 
-    # The text array
-    text_line = 'TEXT = ['
+    # Text contents
+    out.write(make_text_array('RIM_TEXT', RIM_TEXT))
+    out.write(make_text_array('UNDER_TEXT', UNDER_TEXT))
 
-    for i in range(0, len(BASE_TEXT)):
-        text_line += '"'
-        text_line += BASE_TEXT[i]
-        text_line += '"'
-        if i < len(BASE_TEXT) - 1:
-            text_line += ', '
+    # Difference from main model to base text
+    out.write('difference() {\n')
 
-    text_line += ']'
+    out.write('union() {\n')
 
-    out.write(f'{text_line};\n')
-
-    # Initialise model
-    out.write('init(MODEL_PARAMS);\n')
+    # Base and centre column
+    out.write('base_and_centre(MODEL_PARAMS);\n')
 
     # Month sections
     for row in range(len(temps) - 1):
@@ -59,5 +72,15 @@ with open('temp_mountain_build.scad', 'w') as out:
         f'{temps["temperature"].iloc[-1]:.3f}, {temps["temperature"].iloc[-1]:.3f});\n'
     )
 
-    # Text
-    out.write('write_text(MODEL_PARAMS, TEXT);\n')
+    # Rim Text
+    out.write('write_rim_text(MODEL_PARAMS, RIM_TEXT);\n')
+
+    out.write('}\n')
+
+    # Under text cutout
+    out.write('union() {\n')
+    out.write('write_under_text(MODEL_PARAMS, UNDER_TEXT);\n')
+    out.write('}\n')
+
+    # End of difference
+    out.write('}\n')
