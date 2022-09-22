@@ -109,6 +109,7 @@ venv.bak/
 # Files made by scripts
 temp_mountain/temp_mountain_build.scad
 **/*stl
+**/*gcode
 
 # Mac bollocks
 .DS_Store
