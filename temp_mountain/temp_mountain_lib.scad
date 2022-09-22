@@ -1,3 +1,5 @@
+PI = 3.14159;
+
 WIDTH=150;
 HEIGHT=150;
 MONTH_ANGLE=-30;
@@ -112,5 +114,44 @@ module base_and_centre(params) {
     // us to the end of the last year
     for (i = [1:12]) {
         month_section(params, params[END_YEAR] + 1, i, params[LAST_TEMP], params[LAST_TEMP]);
+    }
+}
+
+module annual_base(params) {
+    cylinder(h=BASE_THICKNESS, r=WIDTH / 2, $fn=64);
+}
+
+module write_annual_rim_text(params, text) {
+    circumference = 2 * PI * (WIDTH / 2);
+    text_len = len(text);
+    step_angle = 4;
+    for(i = [0 : text_len - 1]) {
+        rotate([0, 0, -i * -step_angle])
+            translate([0, WIDTH / 2 - 2.5, 0])
+                rotate([0,0,180])
+                    linear_extrude(4)
+                        text(
+                            text[i],
+                            font = TEXT_FONT,
+                            size = RIM_TEXT_SIZE,
+                            valign = "bottom", halign = "center"
+                        );
+    }
+}
+
+function year_cylinder_width(params) = (WIDTH / 2) / years(params);
+
+module year_cylinder(params, year, temp) {
+    years_from_end = params[END_YEAR] - year;
+    inner_offset = year_cylinder_width(params) * years_from_end / 2;
+    outer_offset = inner_offset + year_cylinder_width(params) / 2;
+
+    if (years_from_end == 1) {
+        cylinder(h=temp_height(params, temp), r1=outer_offset, r2=outer_offset);
+    } else {
+        difference() {
+            cylinder(h = temp_height(params, temp), r1 = outer_offset, r2 = outer_offset, $fn=64);
+            cylinder(h = temp_height(params, temp) + 1, r1 = inner_offset, r2 = inner_offset, $fn=64);
+        }
     }
 }

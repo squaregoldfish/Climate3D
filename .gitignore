@@ -108,6 +108,7 @@ venv.bak/
 
 # Files made by scripts
 temp_mountain/temp_mountain_build.scad
+temp_mountain/temp_mountain_annual_build.scad
 **/*stl
 **/*gcode
 
