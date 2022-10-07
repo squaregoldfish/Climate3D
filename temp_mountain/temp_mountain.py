@@ -52,6 +52,9 @@ with open('temp_mountain_build.scad', 'w') as out:
     out.write(make_text_array('RIM_TEXT', RIM_TEXT))
     out.write(make_text_array('UNDER_TEXT', UNDER_TEXT))
 
+    # Overall rotation
+    out.write('rotate([0, 0, 180]) {\n')
+
     # Difference from main model to base text
     out.write('difference() {\n')
 
@@ -83,4 +86,7 @@ with open('temp_mountain_build.scad', 'w') as out:
     out.write('}\n')
 
     # End of difference
+    out.write('}\n')
+
+    # End of rotation
     out.write('}\n')
