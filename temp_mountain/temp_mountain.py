@@ -1,12 +1,13 @@
 import pandas as pd
 
-START_YEAR = 1922
-END_YEAR = 2021
+START_YEAR = 1924
+END_YEAR = 2023
 
 RIM_TEXT = ['HadCRUT', f'{START_YEAR}-{END_YEAR}', '', '', '',
             '', '', '', '', '', '', '']
 
-UNDER_TEXT = ['Steve Jones', '@squaregoldfish', '', 'Inspired by', 'Ed Hawkins', '@ed_hawkins']
+UNDER_TEXT = ['Steve Jones', '@squaregoldfish', '@mastodon.social', '',
+              'Inspired by', 'Ed Hawkins', '@ed_hawkins', '@fediscience.org']
 
 
 def make_text_array(name, contents):
@@ -24,9 +25,8 @@ def make_text_array(name, contents):
 
     return line
 
-
 temps = pd.DataFrame(columns=['year', 'month', 'temperature'])
-hadcrut = pd.read_csv('HadCRUT.5.0.1.0.analysis.summary_series.global.monthly.csv')
+hadcrut = pd.read_csv('HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.csv')
 for index, row in hadcrut.iterrows():
     year, month = row['Time'].split("-")
     if START_YEAR <= int(year) <= END_YEAR:
