@@ -107,8 +107,7 @@ venv.bak/
 **/HadCRUT*
 
 # Files made by scripts
-temp_mountain/temp_mountain_build.scad
-temp_mountain/temp_mountain_annual_build.scad
+temp_mountain/temp_mountain_data.scad
 **/*stl
 **/*gcode
 

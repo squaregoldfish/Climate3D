@@ -6,9 +6,6 @@ END_YEAR = 2023
 RIM_TEXT = ['HadCRUT', f'{START_YEAR}-{END_YEAR}', '', '', '',
             '', '', '', '', '', '', '']
 
-UNDER_TEXT = ['Steve Jones', '@squaregoldfish', '@mastodon.social', '',
-              'Inspired by', 'Ed Hawkins', '@ed_hawkins', '@fediscience.org']
-
 
 def make_text_array(name, contents):
     # The text array
@@ -25,6 +22,7 @@ def make_text_array(name, contents):
 
     return line
 
+
 temps = pd.DataFrame(columns=['year', 'month', 'temperature'])
 hadcrut = pd.read_csv('HadCRUT.5.0.2.0.analysis.summary_series.global.monthly.csv')
 for index, row in hadcrut.iterrows():
@@ -37,11 +35,8 @@ for index, row in hadcrut.iterrows():
 if min(temps["temperature"]) < 0.0:
     temps["temperature"] = temps["temperature"] + abs(min(temps["temperature"]))
 
-# Write the OpenSCAD script
-with open('temp_mountain_build.scad', 'w') as out:
-    # Import the background library
-    out.write('use <temp_mountain_lib.scad>\n')
-
+# Write the data for the OpenSCAD script
+with open('temp_mountain_data.scad', 'w') as out:
     # Main parameters
     out.write(
         f'MODEL_PARAMS = [{START_YEAR}, {END_YEAR}, {min(temps["temperature"])}, '
@@ -50,43 +45,12 @@ with open('temp_mountain_build.scad', 'w') as out:
 
     # Text contents
     out.write(make_text_array('RIM_TEXT', RIM_TEXT))
-    out.write(make_text_array('UNDER_TEXT', UNDER_TEXT))
 
-    # Overall rotation
-    out.write('rotate([0, 0, 180]) {\n')
+    # The temperature data. This is a simple array starting at January in the first
+    # year and ending at December in the last year.
+    out.write('MONTH_TEMPS = [')
 
-    # Difference from main model to base text
-    out.write('difference() {\n')
+    for row in range(len(temps)):
+        out.write(f'{temps["temperature"][row]:.3f}, ')
 
-    out.write('union() {\n')
-
-    # Base and centre column
-    out.write('base_and_centre(MODEL_PARAMS);\n')
-
-    # Month sections
-    for row in range(len(temps) - 1):
-        out.write(
-            f'month_section(MODEL_PARAMS, {temps["year"][row]}, {temps["month"][row]}, '
-            f'{temps["temperature"][row]:.3f}, {temps["temperature"][row + 1]:.3f});\n'
-        )
-
-    out.write(
-        f'month_section(MODEL_PARAMS, {temps["year"].iloc[-1]}, {temps["month"].iloc[-1]}, '
-        f'{temps["temperature"].iloc[-1]:.3f}, {temps["temperature"].iloc[-1]:.3f});\n'
-    )
-
-    # Rim Text
-    out.write('write_rim_text(MODEL_PARAMS, RIM_TEXT);\n')
-
-    out.write('}\n')
-
-    # Under text cutout
-    out.write('union() {\n')
-    out.write('write_under_text(MODEL_PARAMS, UNDER_TEXT);\n')
-    out.write('}\n')
-
-    # End of difference
-    out.write('}\n')
-
-    # End of rotation
-    out.write('}\n')
+    out.write('];\n')
