@@ -27,6 +27,12 @@ function year_width(params) = (WIDTH - BASE_OUTLINE) / ((years(params) + 2) * 2)
 
 function month_index(params, year, month) = ((year - params[START_YEAR]) * 12) + (month - 1);
 
+function year_count(params) = params[END_YEAR] - params[START_YEAR] + 1;
+
+function years_per_section(params, sections) = floor(year_count(params) / sections);
+
+function year_index(params, year) = year - params[START_YEAR];
+
 module month_section(params, temp_data, year, month) {
     start_index = month_index(params, year, month);
     end_index = (start_index + 1) < len(temp_data) ? (start_index + 1) : start_index;
