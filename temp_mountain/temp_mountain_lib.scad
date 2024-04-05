@@ -180,18 +180,11 @@ module base(params, text) {
                     month, BASE_THICKNESS);
             }
         }
-        
-        // Underneath cut-out for orientation
-        translate([0, WIDTH / 2 - 6, 0]) {
-            cylinder(BASE_THICKNESS / 3, 3, 3, $fn=30);
-        }
     }
 }
 
 module central_pillar(params) {
     // The central pillar
-    translate([0, 0, BASE_THICKNESS / 2]) {
-        cylinder(h=temp_height(params, params[LAST_TEMP]) + BASE_THICKNESS / 2,
-            r=year_width(params), $fn=12);
-    }
+    cylinder(h=temp_height(params, params[LAST_TEMP]) + BASE_THICKNESS / 2,
+        r=year_width(params) * 1.5, $fn=12);
 }

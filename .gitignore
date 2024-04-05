@@ -117,3 +117,6 @@ temp_mountain/temp_mountain_data.scad
 # PyCharm bollocks
 **/.idea
 
+# Blender files - I create them for intermediate steps
+**/*.blend*
+
