@@ -6,10 +6,9 @@ MONTH_ANGLE=-30;
 BASE_OUTLINE=25;
 BASE_THICKNESS=5;
 
-TEXT_FONT="Mont:style=Heavy DEMO";
-RIM_TEXT_SIZE=5.4;
+TEXT_FONT="Rubik:style=Bold";
+RIM_TEXT_SIZE=5.7;
 RIM_TEXT_THICKNESS=1;
-UNDER_TEXT_SIZE=6;
 
 // params parameter indices
 START_YEAR = 0;

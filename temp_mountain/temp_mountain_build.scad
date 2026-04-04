@@ -2,7 +2,7 @@ include <temp_mountain_lib.scad>
 include <temp_mountain_data.scad>
 
 // 0 = All in one
-SECTIONS = 5;
+SECTIONS = 0;
 
 base(MODEL_PARAMS, RIM_TEXT);
 
