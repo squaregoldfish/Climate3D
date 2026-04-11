@@ -7,7 +7,7 @@ BASE_OUTLINE=25;
 BASE_THICKNESS=5;
 
 TEXT_FONT="Rubik:style=Bold";
-RIM_TEXT_SIZE=5.7;
+RIM_TEXT_SIZE=5.25;
 RIM_TEXT_THICKNESS=1;
 
 // params parameter indices
